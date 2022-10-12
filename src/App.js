@@ -1,56 +1,67 @@
 import React, { useState, useEffect } from 'react';
-import  Todos from './components/Todos';
-import Pagination from './components/Pagination';
+import Todos from './components/Todos';
 import axios from 'axios';
+
+import DoublyLL from './utils/DoublyLL';
 import './App.css';
 
 const App = () => {
-  const [todos, setTodos] = useState([]);
+  const [t, setT] = useState(null);
+  const [todos, setTodos] = useState(new DoublyLL());
   const [loading, setLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [todosPerPage] = useState(10);
 
   useEffect(() => {
     const fetchTodos = async () => {
       setLoading(true);
-      const res = await axios.get('https://jsonplaceholder.typicode.com/todos');
-      setTodos(res.data);
+      const {data} = await axios.get('https://jsonplaceholder.typicode.com/todos');
+
+
+      let newarr=[];
+      for(let i=0; i<data.length; i=i+10){
+          newarr = data.slice(i,i+10);
+          todos.addTailNode(newarr);
+          newarr=[];
+      }
       setLoading(false);
+      setT(todos.head.data)
     };
-
+    setTodos(todos);
     fetchTodos();
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[]);
 
-  // Get current posts
-  const indexOfLastTodo = currentPage * todosPerPage;
-  const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
-  const currentTodos = todos.slice(indexOfFirstTodo, indexOfLastTodo);
-
-  // Change page
-  const paginate = pageNumber => setCurrentPage(pageNumber);
+  function nextPage(){
+    setT(todos.next().data)
+  }
+  function prevPage(){
+    setT(todos.prev().data)
+  }
 
   return (
-    <div >
-      {/* <h1 className='text-primary mb-3'>My Blog</h1> */}
+    <>
+    <div className='container'>
       <table className='table'>
         <thead>
           <tr>
-            <td>Id</td>
-            <td>User Id</td>
-            <td>Title</td>
-            <td>Status</td>
+            <td className='table-dark'>Id</td>
+            <td className='table-dark'>User Id</td>
+            <td className='table-dark'>Title</td>
+            <td className='table-dark'>Status</td>
           </tr>
         </thead>
+      {loading ?
+       <h1>Loading...</h1> : 
         <tbody>
-          <Todos posts={currentTodos} loading={loading} />
+          <Todos posts={t} />
         </tbody>
+      }
       </table>
-      <Pagination
-        todosPerPage={todosPerPage}
-        totalPosts={todos.length}
-        paginate={paginate}
-      />
+      <div className='buttons'>
+          <button onClick={prevPage}>Prev</button>
+          <button onClick={nextPage}>Next</button>
+      </div>
     </div>
+    </>
   );
 };
 

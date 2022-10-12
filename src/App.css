@@ -36,3 +36,22 @@
     transform: rotate(360deg);
   }
 }
+
+.table {
+  height: 70vh;
+  border: 2px solid rgb(0, 0, 0);
+  width: 90%;
+  margin-left: 40px;
+  margin-top:40px ;
+}
+
+.buttons {
+  /* border: 2px solid red; */
+  /* width: fit-content; */
+  display: flex;
+  justify-content: center;
+}
+
+button{
+  margin:10px;
+}
